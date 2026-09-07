@@ -17,7 +17,7 @@ export default function BillboardChart() {
   const [selectedArtist, setSelectedArtist] = useState(null);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/my-hot-100')
+    fetch('https://tracktide-api-aeffdyfccwasf9ds.germanywestcentral-01.azurewebsites.net/api/my-hot-100')
       .then((res) => {
         if (!res.ok) throw new Error('Could not connect to FastAPI backend.');
         return res.json();

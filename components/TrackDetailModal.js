@@ -10,7 +10,7 @@ export default function TrackDetailModal({ spotifyId, onClose }) {
     if (!spotifyId) return;
 
     setLoading(true);
-    fetch(`http://127.0.0.1:8000/api/track-history/${spotifyId}`)
+    fetch(`https://tracktide-api-aeffdyfccwasf9ds.germanywestcentral-01.azurewebsites.net/api/track-history/${spotifyId}`)
       .then((res) => res.json())
       .then((resData) => {
         setData(resData);

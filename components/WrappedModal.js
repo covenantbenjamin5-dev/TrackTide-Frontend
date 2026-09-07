@@ -12,11 +12,11 @@ export default function WrappedModal() {
     const hasSeenWrapped = localStorage.getItem('wrapped_seen_2026');
     if (hasSeenWrapped) return;
 
-    fetch('http://127.0.0.1:8000/api/wrapped/status')
+    fetch('https://tracktide-api-aeffdyfccwasf9ds.germanywestcentral-01.azurewebsites.net/api/wrapped/status')
       .then(res => res.json())
       .then(data => {
         if (data.should_show_flashcard) {
-          fetch('http://127.0.0.1:8000/api/wrapped?limit=100')
+          fetch('https://tracktide-api-aeffdyfccwasf9ds.germanywestcentral-01.azurewebsites.net/api/wrapped?limit=100')
             .then(res => res.json())
             .then(wrapped => {
               if (wrapped.wrapped_chart && wrapped.wrapped_chart.length > 0) {

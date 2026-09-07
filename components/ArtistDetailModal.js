@@ -10,7 +10,7 @@ export default function ArtistDetailModal({ artistName, onClose, onSelectTrack }
     if (!artistName) return;
 
     setLoading(true);
-    fetch(`http://127.0.0.1:8000/api/artist-summary/${encodeURIComponent(artistName)}`)
+    fetch(`https://tracktide-api-aeffdyfccwasf9ds.germanywestcentral-01.azurewebsites.net/api/artist-summary/${encodeURIComponent(artistName)}`)
       .then((res) => res.json())
       .then((resData) => {
         setData(resData);
