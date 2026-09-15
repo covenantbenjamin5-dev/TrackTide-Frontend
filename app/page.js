@@ -5,7 +5,28 @@ import WrappedModal from '@/components/WrappedModal';
 import TrackDetailModal from '@/components/TrackDetailModal';
 import ArtistDetailModal from '@/components/ArtistDetailModal';
 
+function SpotifyLoginButton() {
+  const handleLogin = () => {
+    const clientId = "02f83084a8324460b2fcd2f92e70dcb9"; 
+    
+    // Dynamically grab the domain so it works flawlessly on both Localhost and Cloudflare
+    const redirectUri = window.location.origin + "/callback";
+    const scopes = "user-top-read";
+
+    const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}`;
+
+    window.location.href = authUrl;
+  };
+
+  return (
+    <button onClick={handleLogin} style={{ padding: '10px 20px', backgroundColor: '#1DB954', color: 'white', borderRadius: '50px', fontWeight: 'bold' }}>
+      Log in with Spotify
+    </button>
+  );
+}
+
 export default function BillboardChart() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false); // Default to false for guests
   const [chartData, setChartData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -17,12 +38,18 @@ export default function BillboardChart() {
   const [selectedArtist, setSelectedArtist] = useState(null);
 
   useEffect(() => {
-    fetch('https://tracktide-api-aeffdyfccwasf9ds.germanywestcentral-01.azurewebsites.net/api/my-hot-100')
+    // Make sure this URL matches exactly where your backend is running!
+    fetch('https://tracktide-api-aeffdyfccwasf9ds.germanywestcentral-01.azurewebsites.net') 
       .then((res) => {
         if (!res.ok) throw new Error('Could not connect to FastAPI backend.');
         return res.json();
       })
       .then((data) => {
+        // 🚨 THE FIX: Unlock the screen if the database exists and isn't empty
+        if (data.date !== "Database Missing" && data.date !== "No Data") {
+          setIsAuthenticated(true);
+        }
+        
         setChartData(data);
         setLoading(false);
       })
@@ -118,6 +145,26 @@ export default function BillboardChart() {
     }, 5000);
     return () => clearInterval(interval);
   }, [flashSlides.length]);
+
+  // --- GUEST VIEW (UNAUTHENTICATED) ---
+  if (!isAuthenticated) {
+    return (
+      <main className="min-h-screen bg-[#050B14] flex flex-col items-center justify-center text-white p-4 font-sans bg-[url('/grid.svg')]">
+        <div className="max-w-md w-full text-center space-y-6 bg-[#0A1220]/90 p-10 rounded-3xl border border-slate-800 shadow-2xl backdrop-blur-md">
+          <div className="mx-auto w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mb-4 shadow-lg shadow-red-600/20">
+            <span className="text-3xl">🌊</span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight uppercase text-white">
+            Track<span className="text-red-600">Tide</span>
+          </h1>
+          <p className="text-slate-400 font-medium text-sm md:text-base px-4 pb-4">
+            Connect your Spotify account to instantly generate your personal Hot 100 chart based on your listening history.
+          </p>
+          <SpotifyLoginButton />
+        </div>
+      </main>
+    );
+  }
 
   if (loading) {
     return (
@@ -481,33 +528,33 @@ export default function BillboardChart() {
 
               {/* Card: Biggest Drop */}
               <div 
-    onClick={() => biggestDrop && setSelectedTrackId(biggestDrop.spotify_id)}
-    className="bg-[#0A1220]/90 border border-red-500/30 rounded-xl p-4 flex flex-col justify-between shadow-lg cursor-pointer hover:border-red-500/60 transition-colors"
-  >
-    <div className="flex items-center justify-between mb-3">
-      <span className="text-xs font-bold uppercase tracking-wider text-red-400">
-        📉 Biggest Drop
-      </span>
-      {biggestDrop && (
-        <span className="text-xs font-bold bg-red-500/20 text-red-400 px-2 py-0.5 rounded border border-red-500/30">
-          {biggestDrop.movement}
-        </span>
-      )}
-    </div>
-    {biggestDrop ? (
-      <div className="flex items-center space-x-3">
-        {biggestDrop.art && (
-          <img src={biggestDrop.art} alt={biggestDrop.title} className="w-12 h-12 rounded-md object-cover flex-shrink-0 shadow" />
-        )}
-        <div className="min-w-0">
-          <p className="text-white font-bold text-sm truncate">{biggestDrop.title}</p>
-          <p className="text-slate-400 text-xs truncate">Rank #{biggestDrop.rank} • {biggestDrop.artist}</p>
-        </div>
-      </div>
-    ) : (
-      <p className="text-slate-500 text-xs">No drops recorded this week</p>
-    )}
-  </div>
+                onClick={() => biggestDrop && setSelectedTrackId(biggestDrop.spotify_id)}
+                className="bg-[#0A1220]/90 border border-red-500/30 rounded-xl p-4 flex flex-col justify-between shadow-lg cursor-pointer hover:border-red-500/60 transition-colors"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-bold uppercase tracking-wider text-red-400">
+                    📉 Biggest Drop
+                  </span>
+                  {biggestDrop && (
+                    <span className="text-xs font-bold bg-red-500/20 text-red-400 px-2 py-0.5 rounded border border-red-500/30">
+                      {biggestDrop.movement}
+                    </span>
+                  )}
+                </div>
+                {biggestDrop ? (
+                  <div className="flex items-center space-x-3">
+                    {biggestDrop.art && (
+                      <img src={biggestDrop.art} alt={biggestDrop.title} className="w-12 h-12 rounded-md object-cover flex-shrink-0 shadow" />
+                    )}
+                    <div className="min-w-0">
+                      <p className="text-white font-bold text-sm truncate">{biggestDrop.title}</p>
+                      <p className="text-slate-400 text-xs truncate">Rank #{biggestDrop.rank} • {biggestDrop.artist}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-slate-500 text-xs">No drops recorded this week</p>
+                )}
+              </div>
 
               {/* Card 4: Top Dominant Artist */}
               <div 
