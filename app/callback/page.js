@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
-export default function CallbackPage() {
+// 1. Extract the main logic into a separate component
+function CallbackContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const code = searchParams.get('code');
@@ -93,5 +94,21 @@ export default function CallbackPage() {
         </>
       )}
     </main>
+  );
+}
+
+// 2. Wrap the extracted component in a Suspense boundary for Next.js build
+export default function CallbackPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-[#050B14] flex flex-col items-center justify-center text-white p-4 font-sans bg-[url('/grid.svg')]">
+        <div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mb-6"></div>
+        <h1 className="text-2xl font-bold tracking-widest text-amber-400 uppercase">
+          Loading...
+        </h1>
+      </main>
+    }>
+      <CallbackContent />
+    </Suspense>
   );
 }
