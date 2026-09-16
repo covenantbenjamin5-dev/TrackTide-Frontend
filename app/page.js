@@ -11,7 +11,7 @@ function SpotifyLoginButton() {
     
     // Dynamically grab the domain so it works flawlessly on both Localhost and Cloudflare
     const redirectUri = window.location.origin + "/callback";
-    const scopes = "user-top-read";
+    const scopes = "user-top-read offline_access";
 
     const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}`;
 
@@ -39,7 +39,7 @@ export default function BillboardChart() {
 
   useEffect(() => {
     // Make sure this URL matches exactly where your backend is running!
-    fetch('https://tracktide-api-aeffdyfccwasf9ds.germanywestcentral-01.azurewebsites.net') 
+    fetch('https://tracktide-api-aeffdyfccwasf9ds.germanywestcentral-01.azurewebsites.net/api/my-hot-100') 
       .then((res) => {
         if (!res.ok) throw new Error('Could not connect to FastAPI backend.');
         return res.json();
@@ -59,7 +59,13 @@ export default function BillboardChart() {
       });
   }, []);
 
-  const tracks = chartData?.chart || [];
+// 1. Grab the raw array from the backend
+  const rawTracks = chartData?.chart || [];
+
+  // 2. Filter out duplicate entries for the same song (keeps only the first instance)
+  const tracks = rawTracks.filter((track, index, self) =>
+    index === self.findIndex((t) => t.spotify_id === track.spotify_id)
+  );
 
   // --- ANALYTICS CALCULATIONS ---
   const topSong = tracks.find((t) => t.rank === 1) || tracks[0];
@@ -146,7 +152,28 @@ export default function BillboardChart() {
     return () => clearInterval(interval);
   }, [flashSlides.length]);
 
-  // --- GUEST VIEW (UNAUTHENTICATED) ---
+  // 1. Show Loading State First
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#050B14] text-white flex items-center justify-center font-sans">
+        <div className="text-xl tracking-wider text-slate-400 animate-pulse">
+          LOADING YOUR HOT 100...
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Show Errors if the Backend is unreachable
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#050B14] text-red-400 flex flex-col items-center justify-center font-sans p-6">
+        <p className="text-xl font-bold mb-2">Backend Connection Error</p>
+        <p className="text-slate-400">{error}</p>
+      </div>
+    );
+  }
+
+  // 3. Show Guest View ONLY if the database is genuinely missing
   if (!isAuthenticated) {
     return (
       <main className="min-h-screen bg-[#050B14] flex flex-col items-center justify-center text-white p-4 font-sans bg-[url('/grid.svg')]">
@@ -163,28 +190,6 @@ export default function BillboardChart() {
           <SpotifyLoginButton />
         </div>
       </main>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#050B14] text-white flex items-center justify-center font-sans">
-        <div className="text-xl tracking-wider text-slate-400 animate-pulse">
-          LOADING YOUR HOT 100...
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-[#050B14] text-red-400 flex flex-col items-center justify-center font-sans p-6">
-        <p className="text-xl font-bold mb-2">Backend Connection Error</p>
-        <p className="text-slate-400">{error}</p>
-        <p className="text-sm text-slate-500 mt-4">
-          Make sure <code className="bg-slate-800 text-amber-300 px-2 py-1 rounded">python app.py</code> is actively running in Anaconda PowerShell.
-        </p>
-      </div>
     );
   }
 
@@ -353,8 +358,8 @@ export default function BillboardChart() {
             {/* Track Rows (CLICKABLE) */}
             <div className="space-y-3">
               {tracks.map((track) => (
-                <div
-                  key={track.rank}
+                 <div
+                  key={track.spotify_id}
                   onClick={() => setSelectedTrackId(track.spotify_id)}
                   className="grid grid-cols-12 gap-2 md:gap-4 items-center bg-[#0A1220]/70 hover:bg-[#0E1A2E] border border-slate-800/60 hover:border-slate-700/80 rounded-lg p-3 transition-all duration-150 cursor-pointer group"
                 >
