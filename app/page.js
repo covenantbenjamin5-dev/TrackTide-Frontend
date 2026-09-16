@@ -217,17 +217,24 @@ export default function BillboardChart() {
       <div className="max-w-5xl mx-auto">
         
         {/* Header Section */}
-        <header className="border-b border-slate-800/80 pb-6 mb-6 text-center md:text-left">
-          <div className="inline-block bg-red-600 text-white font-black text-xs tracking-widest px-3 py-1 mb-3 uppercase shadow-md">
-            Personal Charts
-          </div>
-          <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tight text-white mb-2">
-            My Hot 100
-          </h1>
-          <p className="text-slate-400 text-sm md:text-base font-medium">
-            Chart Week Ending: <span className="text-slate-200 font-semibold">{chartData?.date}</span>
-          </p>
-        </header>
+        <header className="border-b border-slate-800/80 pb-6 mb-6 text-center md:text-left flex flex-col md:flex-row justify-between items-center">
+  <div>
+    <div className="inline-block bg-red-600 text-white font-black text-xs tracking-widest px-3 py-1 mb-3 uppercase shadow-md">
+      Personal Charts
+    </div>
+    <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tight text-white mb-2">
+      My Hot 100
+    </h1>
+    <p className="text-slate-400 text-sm md:text-base font-medium">
+      Chart Week Ending: <span className="text-slate-200 font-semibold">{chartData?.date}</span>
+    </p>
+  </div>
+
+  {/* 🚨 ADDED LOGIN BUTTON HERE FOR RE-AUTH */}
+  <div className="mt-4 md:mt-0">
+    <SpotifyLoginButton />
+  </div>
+</header>
 
         {/* ⚡ SLIDESHOW NEWS CARD (AUTO-PLAYING) */}
         {activeSlide && (
