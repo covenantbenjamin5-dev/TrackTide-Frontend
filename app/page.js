@@ -9,7 +9,9 @@ function SpotifyLoginButton() {
   const handleLogin = () => {
     const clientId = "02f83084a8324460b2fcd2f92e70dcb9"; 
     const redirectUri = window.location.origin + "/callback";
-    const scopes = "user-top-read offline_access";
+    
+    // 🚨 THE SCOPE HACK: Added 'user-read-email' to force the consent screen
+    const scopes = "user-top-read user-read-email offline_access";
 
     const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}&show_dialog=true`;
 
