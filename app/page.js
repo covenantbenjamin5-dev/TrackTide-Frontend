@@ -28,10 +28,13 @@ function SpotifyLoginButton() {
 function NavBar({ onLogout }) {
   return (
     <nav className="w-full flex justify-between items-center p-4 md:px-10 bg-[#0A1220]/90 border-b border-slate-800 backdrop-blur-md sticky top-0 z-40">
-      <div className="flex items-center space-x-2">
-        <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center shadow-lg shadow-red-600/20">
-          <span className="text-sm">🌊</span>
-        </div>
+      <div className="flex items-center space-x-3">
+        {/* 🚨 REPLACED EMOJI WITH CUSTOM LOGO */}
+        <img 
+          src="/logo.jpg" 
+          alt="TrackTide Logo" 
+          className="w-9 h-9 rounded-full object-cover shadow-lg shadow-cyan-900/40"
+        />
         <span className="font-black tracking-tight uppercase text-white text-lg">
           Track<span className="text-red-600">Tide</span>
         </span>
@@ -201,9 +204,14 @@ export default function BillboardChart() {
     return (
       <main className="min-h-screen bg-[#050B14] flex flex-col items-center justify-center text-white p-4 font-sans bg-[url('/grid.svg')]">
         <div className="max-w-md w-full text-center space-y-6 bg-[#0A1220]/90 p-10 rounded-3xl border border-slate-800 shadow-2xl backdrop-blur-md">
-          <div className="mx-auto w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mb-4 shadow-lg shadow-red-600/20">
-            <span className="text-3xl">🌊</span>
-          </div>
+          
+          {/* 🚨 REPLACED EMOJI WITH CUSTOM LOGO */}
+          <img 
+            src="/logo.jpg" 
+            alt="TrackTide Logo" 
+            className="mx-auto w-20 h-20 rounded-full mb-4 object-cover shadow-xl shadow-cyan-900/40"
+          />
+          
           <h1 className="text-4xl md:text-5xl font-black tracking-tight uppercase text-white">
             Track<span className="text-red-600">Tide</span>
           </h1>
