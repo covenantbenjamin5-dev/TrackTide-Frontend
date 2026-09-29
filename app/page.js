@@ -73,7 +73,17 @@ export default function BillboardChart() {
 
   // HOOK #9: Fetch data from backend
   useEffect(() => {
-    fetch('https://tracktide-api-aeffdyfccwasf9ds.germanywestcentral-01.azurewebsites.net/api/my-hot-100') 
+    // 🔥 Multi-Tenant Update: Retrieve specific user ID
+    const userId = localStorage.getItem('tracktide_user_id');
+    
+    // If no user ID is found, they are a guest. Stop loading and show login screen.
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
+
+    // Pass the specific ID directly to the isolated API endpoint
+    fetch(`https://tracktide-api-aeffdyfccwasf9ds.germanywestcentral-01.azurewebsites.net/api/my-hot-100/${userId}`) 
       .then((res) => {
         if (!res.ok) throw new Error('Could not connect to FastAPI backend.');
         return res.json();
