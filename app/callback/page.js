@@ -9,7 +9,9 @@ function CallbackContent() {
   const [status, setStatus] = useState('Authenticating with Spotify...');
 
   useEffect(() => {
-    const code = searchParams.get('code');
+    // 🔥 BULLETPROOF FIX: Try Next.js first, fallback to standard browser URL parsing for Cloudflare
+    const code = searchParams.get('code') || new URLSearchParams(window.location.search).get('code');
+    
     if (!code) {
       setStatus('No authorization code found in the URL.');
       return;
@@ -29,7 +31,7 @@ function CallbackContent() {
       if (data.error) {
         setStatus('Error: ' + data.error);
       } else {
-        // 🔥 MULTI-TENANT UPGRADE: Save the user's specific ID to local storage
+        // Save the user's specific ID to local storage
         if (data.user_id) {
            localStorage.setItem('tracktide_user_id', data.user_id);
         }
@@ -50,7 +52,6 @@ function CallbackContent() {
 export default function CallbackPage() {
   return (
     <div className="min-h-screen bg-[#050B14] text-white flex items-center justify-center font-sans">
-      {/* 🚨 WRAPPED IN SUSPENSE TO PASS CLOUDFLARE BUILD */}
       <Suspense fallback={<div className="text-xl tracking-wider text-slate-400 animate-pulse">Loading Spotify Connection...</div>}>
         <CallbackContent />
       </Suspense>
