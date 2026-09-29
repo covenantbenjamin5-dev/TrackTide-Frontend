@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function CallbackPage() {
+function CallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState('Authenticating with Spotify...');
@@ -41,10 +41,19 @@ export default function CallbackPage() {
   }, [searchParams, router]);
 
   return (
+    <div className="text-xl tracking-wider text-slate-400 animate-pulse">
+      {status}
+    </div>
+  );
+}
+
+export default function CallbackPage() {
+  return (
     <div className="min-h-screen bg-[#050B14] text-white flex items-center justify-center font-sans">
-      <div className="text-xl tracking-wider text-slate-400 animate-pulse">
-        {status}
-      </div>
+      {/* 🚨 WRAPPED IN SUSPENSE TO PASS CLOUDFLARE BUILD */}
+      <Suspense fallback={<div className="text-xl tracking-wider text-slate-400 animate-pulse">Loading Spotify Connection...</div>}>
+        <CallbackContent />
+      </Suspense>
     </div>
   );
 }
